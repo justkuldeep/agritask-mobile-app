@@ -4,9 +4,9 @@
  * FIELD users        → Department dashboard (select dept → fill forms)
  * OWNER / MANAGER / SUPER_ADMIN → Summary view (stats + CSV download)
  *
- * Back-button fix: intercepts Android hardware back and navigates to
- * the home tab instead of exiting the app (caused by the <Redirect> in
- * (tabs)/feedback.jsx which replaces the tab in navigation history).
+ * Note: This component is rendered both:
+ * 1. As a tab in (tabs)/feedback.jsx (no back button handling needed)
+ * 2. Directly via navigation from root (back button handling needed)
  */
 import React, { useState, useEffect, useCallback, memo } from 'react';
 import {
@@ -23,7 +23,7 @@ import {
   Alert,
   BackHandler,
 } from 'react-native';
-import { useRouter, useFocusEffect } from 'expo-router';
+import { useRouter, useFocusEffect, useRoute } from 'expo-router';
 import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 import { Colors, Spacing, Typography, Radius, Shadows } from '../../constants/theme';
@@ -490,23 +490,30 @@ function ManagementView({ user }) {
 
 export default function FeedbackRootScreen() {
   const router = useRouter();
+  const route = useRoute();
   const { user } = useAuth();
   const { queueCount, sync, syncing, refreshCount } = useOfflineQueue();
 
   const role = user?.role?.toUpperCase?.() || '';
   const isManagement = MANAGEMENT_ROLES.includes(role);
 
-  // Fix Android back button: redirect sent us outside the tabs stack,
-  // so pressing back would exit the app. Intercept and go home instead.
+  // Only register back handler when navigated directly, not when rendered as a tab
   useFocusEffect(
     useCallback(() => {
+      // Check if we're rendered inside the (tabs) layout by examining the route path
+      const isRenderedAsTab = route.pathname?.includes('tabs') || false;
+      
+      if (isRenderedAsTab) {
+        return; // Don't register handler when rendered as tab
+      }
+      
       const onBack = () => {
         router.replace('/(tabs)');
-        return true; // prevent default (app exit)
+        return true;
       };
       const sub = BackHandler.addEventListener('hardwareBackPress', onBack);
       return () => sub.remove();
-    }, [router]),
+    }, [router, route.pathname]),
   );
 
   useEffect(() => {

@@ -1,24 +1,12 @@
-import React from 'react';
-import { View } from 'react-native';
-import { router } from 'expo-router';
-import NavigationReady from '../../services/navigationReady';
-
 /**
- * Feedback tab entry point — class component, zero hooks.
- *
- * Uses NavigationReady.whenReady() to guarantee the Expo Router
- * navigation container is fully mounted before navigating.
- * Never navigates during render or before Root Layout mounts.
+ * Feedback tab entry point
+ * 
+ * Renders the main feedback screen directly within the tab
+ * to avoid navigation redirect issues with the Tabs navigator.
+ * The feedback content is in the parallel /feedback/index.jsx file
+ * which is reused here to prevent the "attempted to navigate before
+ * mounting the Root Layout" error.
  */
-export default class FeedbackTab extends React.Component {
-  componentDidMount() {
-    // Only navigate after Root Layout has called NavigationReady.setReady()
-    NavigationReady.whenReady(() => {
-      router.replace('/feedback');
-    });
-  }
+import FeedbackScreen from '../feedback/index';
 
-  render() {
-    return <View />;
-  }
-}
+export default FeedbackScreen;
