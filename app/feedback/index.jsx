@@ -23,7 +23,7 @@ import {
   Alert,
   BackHandler,
 } from 'react-native';
-import { useRouter, useFocusEffect, useRoute } from 'expo-router';
+import { useRouter, useFocusEffect } from 'expo-router';
 import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 import { Colors, Spacing, Typography, Radius, Shadows } from '../../constants/theme';
@@ -490,30 +490,23 @@ function ManagementView({ user }) {
 
 export default function FeedbackRootScreen() {
   const router = useRouter();
-  const route = useRoute();
   const { user } = useAuth();
   const { queueCount, sync, syncing, refreshCount } = useOfflineQueue();
 
   const role = user?.role?.toUpperCase?.() || '';
   const isManagement = MANAGEMENT_ROLES.includes(role);
 
-  // Only register back handler when navigated directly, not when rendered as a tab
+  // Register back handler for Android - when navigated directly from root
+  // When rendered as a tab, the tabs navigator handles back button
   useFocusEffect(
     useCallback(() => {
-      // Check if we're rendered inside the (tabs) layout by examining the route path
-      const isRenderedAsTab = route.pathname?.includes('tabs') || false;
-      
-      if (isRenderedAsTab) {
-        return; // Don't register handler when rendered as tab
-      }
-      
       const onBack = () => {
         router.replace('/(tabs)');
         return true;
       };
       const sub = BackHandler.addEventListener('hardwareBackPress', onBack);
       return () => sub.remove();
-    }, [router, route.pathname]),
+    }, [router]),
   );
 
   useEffect(() => {
