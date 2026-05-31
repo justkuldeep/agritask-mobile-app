@@ -21,6 +21,11 @@ import LoadingSpinner from '../components/ui/LoadingSpinner';
 import { Colors } from '../constants/theme';
 
 class IndexInner extends React.Component {
+  constructor(props) {
+    super(props);
+    this.hasNavigated = false;
+  }
+
   _navigate() {
     NavigationReady.whenReady(() => {
       if (this.props.isAuthenticated) {
@@ -33,8 +38,9 @@ class IndexInner extends React.Component {
 
   componentDidUpdate(prevProps) {
     const { loading } = this.props;
-    // Navigate only when auth loading finishes (true → false)
-    if (!loading && prevProps.loading) {
+    // Navigate only when: (1) not already navigated, (2) loading becomes false, (3) was previously true
+    if (!this.hasNavigated && !loading && prevProps.loading) {
+      this.hasNavigated = true;
       this._navigate();
     }
   }

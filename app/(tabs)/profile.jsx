@@ -16,6 +16,7 @@ import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useAuth } from '../../services/authStore';
+import NavigationReady from '../../services/navigationReady';
 import Card from '../../components/ui/Card';
 import Button from '../../components/ui/Button';
 import { Colors, Spacing, Typography, Radius } from '../../constants/theme';
@@ -38,7 +39,9 @@ export default function ProfileScreen() {
           style: 'destructive',
           onPress: async () => {
             await logout();
-            router.replace('/(auth)/login');
+            NavigationReady.whenReady(() => {
+              router.replace('/(auth)/login');
+            });
           },
         },
       ],

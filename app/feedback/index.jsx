@@ -206,7 +206,7 @@ function FieldView({ user, queueCount, sync, syncing }) {
       const fileName = `my_field_data_${today}.csv`;
       const fileUri = (FileSystem.documentDirectory || '') + fileName;
       await FileSystem.writeAsStringAsync(fileUri, csvContent, {
-        encoding: FileSystem.EncodingType.UTF8,
+        encoding: 'utf8',
       });
       const canShare = await Sharing.isAvailableAsync();
       if (canShare) {
@@ -343,7 +343,7 @@ function ManagementView({ user }) {
         : `field_data_all_${today}.csv`;
       const fileUri = (FileSystem.documentDirectory || '') + fileName;
       await FileSystem.writeAsStringAsync(fileUri, csvContent, {
-        encoding: FileSystem.EncodingType.UTF8,
+        encoding: 'utf8',
       });
       const canShare = await Sharing.isAvailableAsync();
       if (canShare) {
